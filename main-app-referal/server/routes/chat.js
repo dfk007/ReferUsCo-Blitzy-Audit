@@ -6,6 +6,79 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
+// System prompt for AI fallback (free cloud LLM)
+const CHATBOT_SYSTEM_PROMPT = `You are Referus Support — the AI assistant for Referus.co, a B2B referral automation platform.
+You are helpful, concise, and knowledgeable about referral marketing, SaaS growth, and the Referus platform.
+Keep answers under 150 words. Use bullet points for lists. Stay focused on Referus features, pricing, onboarding, integrations, and referral marketing best practices.
+If asked anything unrelated to Referus or business software, politely redirect.
+Referus key facts: B2B referral platform, free tier available, integrates with Stripe/HubSpot/Zapier, white-label ready, fraud detection built-in, real-time analytics, API + webhooks.`;
+
+// @route   POST /api/chat/ai
+// @desc    AI fallback for support chatbot (free cloud LLM — Groq). No auth required for public widget.
+// @access  Public
+router.post('/ai', [
+  body('messages').isArray().withMessage('messages must be an array'),
+  body('messages.*.role').isIn(['user', 'assistant', 'system']).withMessage('Invalid role'),
+  body('messages.*.content').isString().withMessage('content must be string'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { messages } = req.body;
+    if (!messages || messages.length === 0) {
+      return res.status(400).json({ message: 'At least one message required' });
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return res.json({
+        reply: "I'm not sure about that one! You can reach our team at **support@referus.co** or browse our docs at **docs.referus.co** 📚 (AI fallback not configured.)",
+      });
+    }
+
+    // Groq OpenAI-compatible API (free tier)
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: process.env.GROQ_CHAT_MODEL || 'llama-3.1-8b-instant',
+        max_tokens: 500,
+        messages: [
+          { role: 'system', content: CHATBOT_SYSTEM_PROMPT },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+      }),
+    });
+
+    if (!groqRes.ok) {
+      const errText = await groqRes.text();
+      console.error('Groq API error:', groqRes.status, errText);
+      return res.status(502).json({
+        reply: "I'm not sure about that one! You can reach our team at **support@referus.co** or browse our docs at **docs.referus.co** 📚",
+      });
+    }
+
+    const data = await groqRes.json();
+    const reply = data?.choices?.[0]?.message?.content?.trim() || null;
+    if (!reply) {
+      return res.json({
+        reply: "I'm not sure about that one! You can reach our team at **support@referus.co** or browse our docs at **docs.referus.co** 📚",
+      });
+    }
+    return res.json({ reply });
+  } catch (err) {
+    console.error('Chat AI error:', err);
+    return res.status(500).json({
+      reply: "I'm not sure about that one! You can reach our team at **support@referus.co** or browse our docs at **docs.referus.co** 📚",
+    });
+  }
+});
+
 // @route   POST /api/chat/send
 // @desc    Send a message
 // @access  Private

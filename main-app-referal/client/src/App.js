@@ -7,7 +7,7 @@ import AdminProtectedRoute from './components/Layout/AdminProtectedRoute';
 import EmployeeProtectedRoute from './components/Layout/EmployeeProtectedRoute';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
-import FloatingChatButton from './components/Chat/FloatingChatButton';
+import ReferusChatbot from './components/Chat/ReferusChatbot';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -78,7 +78,7 @@ function App() {
                 </Routes>
               </main>
               <Footer />
-              <FloatingChatButton />
+              <ReferusChatbot />
             </div>
           } />
         </Routes>

@@ -142,28 +142,19 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// ... existing code ...
+// Listen when running as a server (Docker or local node index.js). Vercel uses api/index.js.
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
 
-// Conditional listening for local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
-  
-  server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is already in use.\n` +
-        `Try one of the following:\n` +
-        `- Kill the process: lsof -n -i :${PORT} | awk 'NR>1 {print $2}' | xargs -r kill -9\n` +
-        `- Or run on another port: PORT=5001 npm run dev`);
-      process.exit(1);
-    }
-    throw err;
-  });
-}
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use.`);
+    process.exit(1);
+  }
+  throw err;
+});
 
-// **REQUIRED FOR VERCEL DEPLOYMENT**
-// Vercel handles the server listening internally for serverless functions.
 module.exports = server;

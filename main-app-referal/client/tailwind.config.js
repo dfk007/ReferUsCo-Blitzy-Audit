@@ -46,6 +46,20 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      keyframes: {
+        'chatbot-slide-up': {
+          from: { opacity: '0', transform: 'translateY(20px) scale(0.97)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        'chatbot-bounce': {
+          '0%, 60%, 100%': { transform: 'translateY(0)' },
+          '30%': { transform: 'translateY(-5px)' },
+        },
+      },
+      animation: {
+        'chatbot-slide-up': 'chatbot-slide-up 0.25s ease',
+        'chatbot-bounce': 'chatbot-bounce 1.2s infinite',
+      },
     },
   },
   plugins: [],
