@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-export const useSocket = (url = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000') => {
+const getSocketUrl = () => {
+  if (process.env.REACT_APP_SOCKET_URL) return process.env.REACT_APP_SOCKET_URL;
+  if (typeof window !== 'undefined') return window.location.origin;
+  return 'http://localhost:5000';
+};
+
+export const useSocket = (url = getSocketUrl()) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
 

@@ -51,8 +51,10 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
+        # Empty = use relative /api (proxied by nginx)
         REACT_APP_API_URL: ""
-        REACT_APP_SOCKET_URL: ""
+        # Browser connects to same origin (nginx:3000), nginx proxies to server
+        REACT_APP_SOCKET_URL: "http://localhost:3000"
     container_name: referus-client
     restart: unless-stopped
     ports:

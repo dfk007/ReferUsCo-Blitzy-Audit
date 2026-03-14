@@ -1,9 +1,15 @@
 import io from 'socket.io-client';
 
+const getSocketUrl = () => {
+  if (process.env.REACT_APP_SOCKET_URL) return process.env.REACT_APP_SOCKET_URL;
+  if (typeof window !== 'undefined') return window.location.origin;
+  return 'http://localhost:5000';
+};
+
 class SocketService {
   constructor() {
     this.socket = null;
-    this.url = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+    this.url = getSocketUrl();
     this.connected = false;
     this.listeners = new Map();
   }
