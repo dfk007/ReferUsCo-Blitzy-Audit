@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, FileText, Send, CheckCircle, X } from 'lucide-react';
+import { queriesAPI } from '../../services/api';
 
 const ContactForm = ({ isModal = false, onClose = null }) => {
   const [formData, setFormData] = useState({
@@ -61,37 +62,19 @@ const ContactForm = ({ isModal = false, onClose = null }) => {
     setIsSubmitting(true);
 
     try {
-      // Send to Formspree endpoint
-      const response = await fetch('https://formspree.io/f/xkgqvjkw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          submissionType: 'Contact Form',
-          notificationEmail: 'shoaibfm1988@gmail.com',
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          url: window.location.href
-        }),
+      await queriesAPI.createQuery({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
       });
-
-      if (response.ok) {
-        setIsSubmitted(true);
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          subject: '',
-          message: ''
-        });
-      } else {
-        throw new Error('Submission failed');
-      }
+      setIsSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
     } catch (error) {
       console.error('Error submitting form:', error);
       setErrors({ submit: 'Failed to submit message. Please try again.' });

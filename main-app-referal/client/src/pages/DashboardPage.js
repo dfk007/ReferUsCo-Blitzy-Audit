@@ -21,6 +21,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import AddLeadForm from '../components/Forms/AddLeadForm';
 import ContactForm from '../components/Forms/ContactForm';
+import { queriesAPI } from '../services/api';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
@@ -50,36 +51,16 @@ const DashboardPage = () => {
     setIsSupportSubmitting(true);
 
     try {
-      const response = await fetch('https://formspree.io/f/xkgqvjkw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'support_message',
-          name: user?.name || 'Dashboard User',
-          email: user?.email || 'user@example.com',
-          message: supportMessage,
-          subject: 'Support Request from Dashboard',
-          notificationEmail: 'shoaibfm1988@gmail.com',
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          url: window.location.href
-        }),
+      await queriesAPI.createQuery({
+        name: user?.name || 'Dashboard User',
+        email: user?.email || 'user@example.com',
+        subject: 'Support Request from Dashboard',
+        message: supportMessage.trim()
       });
-
-      if (response.ok) {
-        setSupportMessage('');
-        setSupportSubmitted(true);
-        toast.success('✅ Your message has been sent. We\'ll get back to you soon.');
-        
-        // Reset success message after 5 seconds
-        setTimeout(() => {
-          setSupportSubmitted(false);
-        }, 5000);
-      } else {
-        throw new Error('Submission failed');
-      }
+      setSupportMessage('');
+      setSupportSubmitted(true);
+      toast.success('✅ Your message has been sent. We\'ll get back to you soon.');
+      setTimeout(() => setSupportSubmitted(false), 5000);
     } catch (error) {
       console.error('Error submitting support message:', error);
       toast.error('Failed to send message. Please try again.');

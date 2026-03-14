@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, X, Send, User, Mail, Phone } from 'lucide-react';
+import { MessageCircle, X, Send, User, Mail } from 'lucide-react';
+import { queriesAPI } from '../../services/api';
 
 const FloatingChatButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,24 +32,13 @@ const FloatingChatButton = () => {
     if (!message.trim()) return;
 
     setIsSubmitting(true);
-    
     try {
-      // Send live chat message
-      await fetch('https://formspree.io/f/xkgqvjkw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'live_chat',
-          message: message,
-          notificationEmail: 'shoaibfm1988@gmail.com',
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          url: window.location.href
-        }),
+      await queriesAPI.createQuery({
+        name: 'Guest',
+        email: 'guest@contact.referralhub.com',
+        subject: 'Live chat message',
+        message: message.trim()
       });
-
       setMessage('');
       setIsSubmitted(true);
     } catch (error) {
@@ -70,23 +60,12 @@ const FloatingChatButton = () => {
     setIsSubmitting(true);
     
     try {
-      await fetch('https://formspree.io/f/xkgqvjkw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'offline_message',
-          name: offlineForm.name,
-          email: offlineForm.email,
-          message: offlineForm.message,
-          notificationEmail: 'shoaibfm1988@gmail.com',
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          url: window.location.href
-        }),
+      await queriesAPI.createQuery({
+        name: offlineForm.name.trim(),
+        email: offlineForm.email.trim(),
+        subject: 'Offline message',
+        message: offlineForm.message.trim()
       });
-
       setOfflineForm({ name: '', email: '', message: '' });
       setIsSubmitted(true);
     } catch (error) {

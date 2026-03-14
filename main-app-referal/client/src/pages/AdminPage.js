@@ -11,7 +11,8 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  BarChart3
+  BarChart3,
+  MessageCircle
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -23,6 +24,7 @@ import AdminEarningsManagement from '../components/Admin/EarningsManagement';
 import AdminSettings from '../components/Admin/AdminSettings';
 import AdminSummary from '../components/Admin/AdminSummary';
 import AdminQueriesManagement from '../components/Admin/AdminQueriesManagement';
+import AdminChatView from '../components/Admin/AdminChatView';
 
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState('summary');
@@ -40,6 +42,7 @@ const AdminPage = () => {
     { id: 'summary', label: 'Summary', icon: BarChart3, color: 'text-blue-600' },
     { id: 'leads', label: 'Leads Management', icon: FileText, color: 'text-green-600' },
     { id: 'users', label: 'Users Management', icon: Users, color: 'text-purple-600' },
+    { id: 'chat', label: 'Chat / Support', icon: MessageCircle, color: 'text-cyan-600' },
     { id: 'earnings', label: 'Earnings Management', icon: DollarSign, color: 'text-yellow-600' },
     { id: 'queries', label: 'Queries', icon: FileText, color: 'text-indigo-600' },
     { id: 'settings', label: 'Settings', icon: Settings, color: 'text-gray-600' }
@@ -80,6 +83,8 @@ const AdminPage = () => {
         return <AdminLeadsManagement />;
       case 'users':
         return <AdminUsersManagement />;
+      case 'chat':
+        return <AdminChatView />;
       case 'earnings':
         return <AdminEarningsManagement />;
       case 'queries':

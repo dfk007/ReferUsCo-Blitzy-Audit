@@ -164,39 +164,6 @@ const AddLeadForm = () => {
       const parsed = parsePhoneNumberFromString(formData.mobile, formData.country);
       const e164Phone = parsed ? parsed.number : formData.mobile;
 
-      // First, submit to Formspree for email notification
-      const formspreeResponse = await fetch('https://formspree.io/f/xkgqvjkw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          companyName: formData.companyName,
-          designation: formData.designation,
-          email: formData.email,
-          mobile: e164Phone,
-          industry: formData.industry === 'Other' ? formData.otherIndustry : formData.industry,
-          hasReference: formData.hasReference,
-          referencePerson: formData.referencePerson,
-          useReference: formData.useReference,
-          details: formData.details,
-          submissionType: 'Lead Referral',
-          notificationEmail: 'shoaibfm1988@gmail.com',
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          url: window.location.href
-        }),
-      });
-
-      if (!formspreeResponse.ok) {
-        throw new Error('Formspree submission failed');
-      }
-
-      // Show success popup immediately after external submission succeeds
-      setIsSubmitted(true);
-
-      // Then, save to database via API (non-blocking for success UI)
       const apiResponse = await fetch(`${API_BASE_URL}/leads`, {
         method: 'POST',
         headers: {

@@ -19,8 +19,7 @@ const ContactPage = () => {
   };
 
   const handleContactUsClick = () => {
-    // Open lead submission form directly
-    window.open('https://formspree.io/f/xkgqvjkw', '_blank');
+    document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleChange = (e) => {
@@ -81,7 +80,7 @@ const ContactPage = () => {
       </section>
 
       {/* Contact Form & Info Section */}
-      <section className="py-20 bg-white">
+      <section id="contact-form" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
